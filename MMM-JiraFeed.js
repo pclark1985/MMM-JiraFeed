@@ -2,13 +2,13 @@
  * Module: MMM-JiraFeed
  *
  * By Peter Clark
+ * MIT Licensed
  */
 Module.register("MMM-JiraFeed", {
 	defaults: {
 		header: "Jira Tickets",
 		updateInterval: 300000, // 5 minutes
-		jiraInstance: "https://webcontent.atlassian.net", // Update this with your Jira instance URL
-		corsProxy: "https://cors-anywhere.herokuapp.com/",
+		jiraInstance: "", // Update this with your Jira instance URL
 		username: "", // Add your Jira username
 		apiKey: "", // Add your Jira API key
 		jiraFilter: "", // Example: "project = MYPROJECT AND status != Done"
@@ -24,55 +24,37 @@ Module.register("MMM-JiraFeed", {
 	},
 
 	getData: function () {
-		// Use CORS Anywhere proxy to bypass CORS restrictions
-		//const corsProxy = "http://192.168.1.131/cors-proxy.php?url=" //"https://cors-anywhere.herokuapp.com/";
-		const url =  this.config.corsProxy + encodeURIComponent(`${this.config.jiraInstance}/rest/api/latest/search?jql=${encodeURIComponent(
-			this.config.jiraFilter
-		)}%20ORDER%20BY%20created%20DESC&maxResults=${this.config.maxResults}`);
+		this.sendSocketNotification("JIRA_CALL", {
+            jiraInstance: this.config.jiraInstance,
+            username: this.config.username,
+            apiKey: this.config.apiKey,
+            jiraFilter: this.config.jiraFilter,
+            maxResults: this.config.maxResults
+        });
+	},
 
-		const options = {
-			method: "GET",
-			headers: {
-				"Authorization": "Basic " + btoa(
-					this.config.username + ":" + this.config.apiKey
-				),
-				"Content-Type": "application/json"
-			},
-		};
-
-		console.log(`[MMM-JiraFeed] Fetching Jira data from URL: ${url}`);
-		console.log("[MMM-JiraFeed] Request options:", options);
-
-		fetch(url, options)
-			.then((response) => {
-				if (!response.ok) {
-					throw new Error(
-						`[MMM-JiraFeed] HTTP error! Status: ${response.status}, StatusText: ${response.statusText}`
-					);
-				}
-				return response.json();
-			})
-			.then((data) => {
-				console.log("[MMM-JiraFeed] Jira API raw response:", data);
-
-				// Process issues
-				if (data.issues && data.issues.length > 0) {
-					this.tickets = data.issues.map((issue) => ({
-						priorityIcon: issue.fields.priority?.iconUrl || "",
-						summary: issue.fields.summary,
-						status: issue.fields.status.name || "Unknown", // Add the status
-					}));
-					console.log("[MMM-JiraFeed] Processed tickets:", this.tickets);
-				} else {
-					console.warn("[MMM-JiraFeed] No tickets available in the response.");
-					this.tickets = [];
-				}
-
-				this.updateDom();
-			})
-			.catch((error) => {
-				console.error("[MMM-JiraFeed] Error fetching Jira data:", error);
-			});
+	socketNotificationReceived: function(notification, payload) {
+		console.log("[MMM-JiraFeed] Received notification:", notification, payload);
+		if (notification === "JIRA_CALL_DATA") {
+			console.log("[MMM-JiraFeed] Received data from node_helper:", payload);
+	
+			// Process issues
+			if (payload.issues && payload.issues.length > 0) {
+				this.tickets = payload.issues.map(issue => ({
+					priorityIcon: issue.fields.priority?.iconUrl || "",
+					summary: issue.fields.summary,
+					status: issue.fields.status.name || "Unknown", // Add the status
+				}));
+				console.log("[MMM-JiraFeed] Processed tickets:", this.tickets);
+			} else {
+				console.warn("[MMM-JiraFeed] No tickets available in the response.");
+				this.tickets = [];
+			}
+	
+			this.updateDom();
+		} else if (notification === "JIRA_CALL_ERROR") {
+			console.error("[MMM-JiraFeed] Error received from node_helper:", payload.error);
+		}
 	},
 
 	scheduleUpdate: function () {
@@ -122,16 +104,9 @@ Module.register("MMM-JiraFeed", {
             }
             // Ticket Summary and Status
             const summary = document.createElement("span");
-            //const statusClassName = ticket.status.toLowerCase().replace(/\s+/g, "-");  // Generate class name for status
-            //const statusSpan = document.createElement("span");
-
-            // Add 'jiraFeed' class first, followed by the dynamically generated class
-            //statusSpan.classList.add("MMM-JiraFeed", statusClassName, "small");
-            //statusSpan.innerText = ticket.status;
 
             summary.innerText = `${ticket.summary}`;// \u2013 `;
 			summary.classList.add("small");  // Adding 'small' class to the summary text
-            //summary.appendChild(statusSpan);  // Append the status span
             listItem.appendChild(summary);
 
             list.appendChild(listItem);
