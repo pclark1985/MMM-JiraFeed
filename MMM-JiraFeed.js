@@ -29,18 +29,19 @@ Module.register("MMM-JiraFeed", {
             username: this.config.username,
             apiKey: this.config.apiKey,
             jiraFilter: this.config.jiraFilter,
-            maxResults: this.config.maxResults
+            maxResults: this.config.maxResults,
+			instanceId: this.identifier
         });
 	},
 
 	socketNotificationReceived: function(notification, payload) {
 		console.log("[MMM-JiraFeed] Received notification:", notification, payload);
-		if (notification === "JIRA_CALL_DATA") {
+		if (notification === "JIRA_CALL_DATA" && payload.instanceId === this.identifier) {
 			console.log("[MMM-JiraFeed] Received data from node_helper:", payload);
 	
 			// Process issues
-			if (payload.issues && payload.issues.length > 0) {
-				this.tickets = payload.issues.map(issue => ({
+			if (payload.data.issues && payload.data.issues.length > 0) {
+				this.tickets = payload.data.issues.map(issue => ({
 					priorityIcon: issue.fields.priority?.iconUrl || "",
 					summary: issue.fields.summary,
 					status: issue.fields.status.name || "Unknown", // Add the status
@@ -52,8 +53,8 @@ Module.register("MMM-JiraFeed", {
 			}
 	
 			this.updateDom();
-		} else if (notification === "JIRA_CALL_ERROR") {
-			console.error("[MMM-JiraFeed] Error received from node_helper:", payload.error);
+		} else if (notification === "JIRA_CALL_ERROR" && payload.instanceId === this.identifier) {
+			console.error("[MMM-JiraFeed] Error received from node_helper:", payload.data.error);
 		}
 	},
 
