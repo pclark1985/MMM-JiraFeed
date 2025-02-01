@@ -12,7 +12,7 @@ Module.register("MMM-JiraFeed", {
 		username: "", // Add your Jira username
 		apiKey: "", // Add your Jira API key
 		jiraFilter: "", // Example: "project = MYPROJECT AND status != Done"
-		maxResults: 10,
+		maxResults: 10, // Maximum of 100
 	},
 
 	start: function () {
