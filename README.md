@@ -2,7 +2,7 @@
 
 Basic feed listing out Jira tickets based on the provided criteria. Uses the Atlassian Jira Rest API to pull up to 100 results.
 
-### Sample Configuration
+## Sample Configuration
 
 {
     module: 'MMM-JiraFeed',
@@ -18,7 +18,7 @@ Basic feed listing out Jira tickets based on the provided criteria. Uses the Atl
     }
 },
 
-### Sample Custom CSS to add colors for status.
+## Sample Custom CSS to add colors for status.
 ### Uses the status name as the class.
 
 .MMM-JiraFeed .open,
