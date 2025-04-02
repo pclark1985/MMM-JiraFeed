@@ -2,6 +2,21 @@
 
 Basic feed listing out Jira tickets based on the provided criteria. Uses the Atlassian Jira Rest API to pull up to 100 results.
 
+## Installation
+Run these commands at the root of your MagicMirror² to install.
+```
+cd modules
+git clone https://github.com/pclark1985/MMM-JiraFeed
+cd MMM-JiraFeed
+npm install
+```
+
+## Update
+```
+cd ~/MagicMirror/modules/MMM-JiraFeed
+git pull
+```
+
 ## Sample Configuration
 ```
 {
