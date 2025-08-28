@@ -18,7 +18,7 @@ module.exports = NodeHelper.create({
 		if (notification === "JIRA_CALL") {
 			console.log("[MMM-JiraFeed] Received request from module:", payload);
 
-			const url = payload.jiraInstance + "/rest/api/latest/search?jql=" + encodeURIComponent(payload.jiraFilter) + "&maxResults=" + payload.maxResults;
+			const url = payload.jiraInstance + "/rest/api/3/search?jql=" + encodeURIComponent(payload.jiraFilter) + "&maxResults=" + payload.maxResults;
 
 			const options = {
 				method: "GET",
