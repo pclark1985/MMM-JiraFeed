@@ -1,7 +1,7 @@
 /*
  * node_helper.js
  *
- * MagicMirror²
+ * MagicMirrorÂ²
  * Module: MMM-JiraFeed
  *
  * By Peter Clark
@@ -18,7 +18,7 @@ module.exports = NodeHelper.create({
 		if (notification === "JIRA_CALL") {
 			console.log("[MMM-JiraFeed] Received request from module:", payload);
 
-			const url = payload.jiraInstance + "/rest/api/3/search/jql?jql=" + encodeURIComponent(payload.jiraFilter) + "&maxResults=" + payload.maxResults;
+			const url = payload.jiraInstance + "/rest/api/3/search/jql?jql=" + encodeURIComponent(payload.jiraFilter) + "&maxResults=" + payload.maxResults + "&fields=priority%2Csummary%2Cstatus";
 
 			const options = {
 				method: "GET",
