@@ -1,7 +1,7 @@
 /*
  * node_helper.js
  *
- * MagicMirrorÂ²
+ * MagicMirror²
  * Module: MMM-JiraFeed
  *
  * By Peter Clark
